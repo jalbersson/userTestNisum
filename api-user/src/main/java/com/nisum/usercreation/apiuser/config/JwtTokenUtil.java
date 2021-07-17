@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.nisum.usercreation.apiuser.entity.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -76,13 +77,23 @@ public class JwtTokenUtil implements Serializable {
     //
 
     /**
-     * Generates a token for a user
+     * Generates a token for an existing user
      * @param userDetails
      * @return
      */
-    public String generateToken(UserDetails userDetails) {
+    public String generateTokenForExistingUser(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return doGenerateToken(claims, userDetails.getUsername());
+    }
+
+    /**
+     * Generates a token for a new user
+     * @param userName
+     * @return
+     */
+    public String generateTokenForNewUser(String userName) {
+        Map<String, Object> claims = new HashMap<>();
+        return doGenerateToken(claims, userName);
     }
 
     /**
