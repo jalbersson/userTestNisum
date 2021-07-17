@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
 @RestController
 public class UserController {
     @Autowired
@@ -34,8 +38,17 @@ public class UserController {
                     System.out.println("El listado de fones esta vacio");
                 }
             }
+            String newUserIdentifier = UUID.randomUUID().toString();
+            System.out.println("UUID: " + newUserIdentifier);
+            user.setId(newUserIdentifier);
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            Date date = new Date();
+            String formattedDate = formatter.format(date);
+            user.setCreated(formattedDate);
+            user.setLastLogin(formattedDate);
             return new ResponseEntity<>(userRepository.save(user), HttpStatus.CREATED);
         } catch (Exception exception){
+            System.out.println("El error fue: " + exception.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

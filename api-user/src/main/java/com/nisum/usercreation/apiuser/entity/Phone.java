@@ -20,6 +20,9 @@ public class Phone {
     @Column(name = "country_code")
     private String contryCode;
 
+    public Phone() {
+    }
+
     public Phone(String number, String citycode, String contryCode) {
         this.number = number;
         this.citycode = citycode;

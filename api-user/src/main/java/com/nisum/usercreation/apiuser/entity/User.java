@@ -12,9 +12,8 @@ import java.util.Objects;
 @Table(name = "user")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private String id;
 
     @Column(name = "name")
     private String name;
@@ -33,22 +32,23 @@ public class User {
     @JoinColumn(name = "user_id")
     private List<Phone> phones;
 
-    @CreationTimestamp
     @Column(name = "created")
-    private Date created;
+    private String created;
 
-    @UpdateTimestamp
     @Column(name = "modified")
-    private Date modified;
+    private String modified;
 
     @Column(name = "last_login")
-    private Date lastLogin;
+    private String lastLogin;
 
     @Column(name = "is_active")
     private boolean active;
 
     @Column(name = "token")
     private String token;
+
+    public User() {
+    }
 
     public User(String name, String email, String password, List<Phone> phones) {
         this.name = name;
@@ -57,11 +57,11 @@ public class User {
         this.phones = phones;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -97,6 +97,46 @@ public class User {
         this.phones = phones;
     }
 
+    public String getCreated() {
+        return created;
+    }
+
+    public void setCreated(String created) {
+        this.created = created;
+    }
+
+    public String getModified() {
+        return modified;
+    }
+
+    public void setModified(String modified) {
+        this.modified = modified;
+    }
+
+    public String getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(String lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -113,10 +153,16 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", phones=" + phones +
+                ", created=" + created +
+                ", modified=" + modified +
+                ", lastLogin=" + lastLogin +
+                ", active=" + active +
+                ", token='" + token + '\'' +
                 '}';
     }
 }
