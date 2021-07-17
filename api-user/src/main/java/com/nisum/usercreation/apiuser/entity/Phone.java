@@ -12,42 +12,42 @@ public class Phone {
     private Long id;
 
     @Column(name = "number")
-    private int number;
+    private String number;
 
     @Column(name = "city_code")
-    private int cityCode;
+    private String citycode;
 
     @Column(name = "country_code")
-    private int countryCode;
+    private String contryCode;
 
-    public Phone(int number, int cityCode, int countryCode) {
+    public Phone(String number, String citycode, String contryCode) {
         this.number = number;
-        this.cityCode = cityCode;
-        this.countryCode = countryCode;
+        this.citycode = citycode;
+        this.contryCode = contryCode;
     }
 
-    public int getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(String number) {
         this.number = number;
     }
 
-    public int getCityCode() {
-        return cityCode;
+    public String getCitycode() {
+        return citycode;
     }
 
-    public void setCityCode(int cityCode) {
-        this.cityCode = cityCode;
+    public void setCitycode(String cityCode) {
+        this.citycode = cityCode;
     }
 
-    public int getCountryCode() {
-        return countryCode;
+    public String getContrycode() {
+        return contryCode;
     }
 
-    public void setCountryCode(int countryCode) {
-        this.countryCode = countryCode;
+    public void setContrycode(String contryCode) {
+        this.contryCode = contryCode;
     }
 
     @Override
@@ -55,20 +55,20 @@ public class Phone {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Phone phone = (Phone) o;
-        return number == phone.number && cityCode == phone.cityCode && countryCode == phone.countryCode;
+        return number == phone.number && citycode == phone.citycode && contryCode == phone.contryCode;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(number, cityCode, countryCode);
+        return Objects.hash(number, citycode, contryCode);
     }
 
     @Override
     public String toString() {
         return "Phone{" +
                 "number=" + number +
-                ", cityCode=" + cityCode +
-                ", countryCode=" + countryCode +
+                ", cityCode=" + citycode +
+                ", countryCode=" + contryCode +
                 '}';
     }
 }

@@ -1,5 +1,8 @@
 package com.nisum.usercreation.apiuser.entity;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
@@ -9,8 +12,9 @@ import java.util.Objects;
 @Table(name = "user")
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private String id;
+    private Long id;
 
     @Column(name = "name")
     private String name;
@@ -22,12 +26,18 @@ public class User {
     private String password;
 
     @Column(name = "phones")
-    @OneToMany
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinColumn(name = "user_id")
     private List<Phone> phones;
 
+    @CreationTimestamp
     @Column(name = "created")
     private Date created;
 
+    @UpdateTimestamp
     @Column(name = "modified")
     private Date modified;
 
@@ -45,6 +55,14 @@ public class User {
         this.email = email;
         this.password = password;
         this.phones = phones;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
