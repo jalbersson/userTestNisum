@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,7 +41,7 @@ public class UserController {
             System.out.println(user.getName());
             System.out.println(user.getEmail());
             System.out.println(user.getPassword());
-            System.out.println("Datos de los fones:");
+            System.out.println("Datos de los phones:");
             if(user.getPhones() != null){
                 if(user.getPhones().size() > 0){
                     for (Phone phone : user.getPhones()){
@@ -49,10 +50,10 @@ public class UserController {
                         System.out.println(phone.getContrycode());
                     }
                 } else {
-                    System.out.println("El listado de fones esta vacio");
+                    System.out.println("El listado de phones esta vacio");
                 }
             }
-            String validFields = validateUserFields(user);
+            String validFields = validateUserFields(user, true);
             if(validFields.equals("Correct")){
                 String newUserIdentifier = UUID.randomUUID().toString();
                 System.out.println("UUID: " + newUserIdentifier);
@@ -78,17 +79,64 @@ public class UserController {
         }
     }
 
+    @PutMapping("/modifyUser")
+    public ResponseEntity<User> modify(@RequestBody User user){
+        try{
+            System.out.println("Datos del usuario: ");
+            System.out.println(user.getName());
+            System.out.println(user.getEmail());
+            System.out.println(user.getPassword());
+            System.out.println("Datos de los phones:");
+            if(user.getPhones() != null){
+                if(user.getPhones().size() > 0){
+                    for (Phone phone : user.getPhones()){
+                        System.out.println(phone.getNumber());
+                        System.out.println(phone.getCitycode());
+                        System.out.println(phone.getContrycode());
+                    }
+                } else {
+                    System.out.println("El listado de phones esta vacio");
+                }
+            }
+            String validFields = validateUserFields(user, false);
+            if(validFields.equals("Correct")){
+                // find the whole record on database
+                User dbUser = userRepository.findByEmail(user.getEmail());
+
+                // Only allow username ,password and active status to be changed
+                dbUser.setName(user.getName());
+                dbUser.setPassword(bcryptEncoder.encode(user.getPassword()));
+                dbUser.setActive(user.isActive());
+
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                Date date = new Date();
+                String formattedDate = formatter.format(date);
+                dbUser.setModified(formattedDate);
+
+                dbUser.setLastLogin(formattedDate);
+                return new ResponseEntity<>(userRepository.save(dbUser), HttpStatus.OK);
+            } else {
+                throw new IllegalArgumentException(validFields);
+            }
+        } catch (Exception exception){
+            System.out.println("El error fue: " + exception.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     /**
      * Verify that the fields on the received user are all valid
      * @param user
+     * @param validateEmailExists: this indicates that the method is called for creating a new
+     *                           user or updating an existing one
      * @return
      */
-    private String validateUserFields(User user){
+    private String validateUserFields(User user, boolean validateEmailExists){
         String result = "Correct";
         if(!isValidEmailAddress(user.getEmail()) || user == null){
             result = "Invalid email format";
         } else {
-            if(emailAlreadyExists(user.getEmail()) || user.getEmail().isEmpty()){
+            if((validateEmailExists && emailAlreadyExists(user.getEmail())) || user.getEmail().isEmpty()){
                 result = "empty or a user with that email already exists on database";
             } else {
                 if(!user.getPassword().isEmpty()) {
