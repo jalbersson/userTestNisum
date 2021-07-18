@@ -91,7 +91,7 @@ public class UserController {
             if(emailAlreadyExists(user.getEmail()) || user.getEmail().isEmpty()){
                 result = "empty or a user with that email already exists on database";
             } else {
-                if(user.getPassword().isEmpty()) {
+                if(!user.getPassword().isEmpty()) {
                     if (!validatePasswordStrength(user.getPassword())) {
                         result = "weak password";
                     }
@@ -110,7 +110,7 @@ public class UserController {
      * @return
      */
     private boolean isValidEmailAddress(String email) {
-        String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        String regex = "^[A-Za-z0-9+_.-]+@(.+)$";
         Pattern pattern = Pattern.compile(regex);
         boolean result = true;
         Matcher matcher = pattern.matcher(email);
@@ -140,13 +140,43 @@ public class UserController {
      * @param password
      * @return
      */
-    private boolean validatePasswordStrength(String password){
-        boolean result = true;
+    /*private boolean validatePasswordStrength(String password){
+        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(password);
         // if the password doesn't contain at least 1 lowercase letter, 1 uppercase letter and 2 digits
-        if (!password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9].*[0-9])")){
-            result = false;
+
+        return matcher.matches();
+    }*/
+
+    /**
+     * Validates the strength of a given password
+     * @param password
+     * @return
+     */
+    private boolean validatePasswordStrength(String password){
+        boolean lowerCase = false;
+        boolean upperCase = false;
+        boolean firstNumber = false;
+        boolean secondNumber = false;
+
+        for(int i =0; i < password.length(); i++){
+            if(Character.isLowerCase(password.charAt(i)))
+                lowerCase = true;
+            if(Character.isUpperCase(password.charAt(i)))
+                upperCase = true;
+            if(Character.isDigit(password.charAt(i))) {
+                if(!firstNumber)
+                    firstNumber = true;
+                else
+                    secondNumber = true;
+            }
+            if(lowerCase && upperCase && firstNumber && secondNumber)
+                break;
         }
 
+        boolean result = lowerCase && upperCase && firstNumber && secondNumber ? true : false;
         return result;
     }
+
 }
