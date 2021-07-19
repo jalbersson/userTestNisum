@@ -3,6 +3,7 @@ package com.nisum.usercreation.apiuser.controller;
 import com.nisum.usercreation.apiuser.config.JwtTokenUtil;
 import com.nisum.usercreation.apiuser.entity.Phone;
 import com.nisum.usercreation.apiuser.entity.User;
+import com.nisum.usercreation.apiuser.model.ErrorResponse;
 import com.nisum.usercreation.apiuser.model.UserByEmailRequest;
 import com.nisum.usercreation.apiuser.repository.IUserRepository;
 import com.nisum.usercreation.apiuser.service.JwtUserDetailsService;
@@ -33,8 +34,13 @@ public class UserController {
     @Autowired
     private PasswordEncoder bcryptEncoder;
 
+    /**
+     * Creates a new user and add a new token for his use at the same time
+     * @param user: a JSON holding the user object to be created
+     * @return
+     */
     @PostMapping("/registerUser")
-    public ResponseEntity<User> save(@RequestBody User user){
+    public ResponseEntity<Object> save(@RequestBody User user){
         try{
             System.out.println("Datos del usuario: ");
             System.out.println(user.getName());
@@ -74,12 +80,18 @@ public class UserController {
             }
         } catch (Exception exception){
             System.out.println("El error fue: " + exception.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * Modifies an existing user
+     * @param user: a JSON holding an object with the updated fields
+     * @return
+     */
     @PutMapping("/modifyUser")
-    public ResponseEntity<User> modify(@RequestBody User user){
+    public ResponseEntity<Object> modify(@RequestBody User user){
         try{
             System.out.println("Datos del usuario: ");
             System.out.println(user.getName());
@@ -119,29 +131,41 @@ public class UserController {
             }
         } catch (Exception exception){
             System.out.println("El error fue: " + exception.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * Finds a user by his email
+     * @param emailRequest: a JSON containing the email for the search
+     * @return
+     */
     @GetMapping("/findUserByEmail")
-    public ResponseEntity<User> findUserByEmail(@RequestBody UserByEmailRequest emailRequest){
+    public ResponseEntity<Object> findUserByEmail(@RequestBody UserByEmailRequest emailRequest){
         try{
             User foundUser = userRepository.findByEmail(emailRequest.getEmail());
             return new ResponseEntity<>(foundUser, HttpStatus.OK);
         } catch (Exception exception){
             System.out.println("El error fue: " + exception.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * Return the list of all current users in the database
+     * @return
+     */
     @GetMapping("/findAllUsers")
-    public ResponseEntity<List<User>> findAllUsers(){
+    public ResponseEntity<Object> findAllUsers(){
         try{
             List<User> foundUsers = userRepository.findAll();
             return new ResponseEntity<>(foundUsers, HttpStatus.OK);
         } catch (Exception exception){
             System.out.println("El error fue: " + exception.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -155,17 +179,17 @@ public class UserController {
     private String validateUserFields(User user, boolean validateEmailExists){
         String result = "Correct";
         if(!isValidEmailAddress(user.getEmail()) || user == null){
-            result = "Invalid email format";
+            result = "Formato del email es incorrecto";
         } else {
             if((validateEmailExists && emailAlreadyExists(user.getEmail())) || user.getEmail().isEmpty()){
-                result = "empty or a user with that email already exists on database";
+                result = "Email vacío o ya existe un usuario con ese email";
             } else {
                 if(!user.getPassword().isEmpty()) {
                     if (!validatePasswordStrength(user.getPassword())) {
-                        result = "weak password";
+                        result = "Password débil";
                     }
                 } else {
-                    result = "empty password";
+                    result = "Password vacío";
                 }
             }
         }
