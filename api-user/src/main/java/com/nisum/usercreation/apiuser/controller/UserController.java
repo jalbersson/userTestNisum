@@ -3,19 +3,18 @@ package com.nisum.usercreation.apiuser.controller;
 import com.nisum.usercreation.apiuser.config.JwtTokenUtil;
 import com.nisum.usercreation.apiuser.entity.Phone;
 import com.nisum.usercreation.apiuser.entity.User;
+import com.nisum.usercreation.apiuser.model.UserByEmailRequest;
 import com.nisum.usercreation.apiuser.repository.IUserRepository;
 import com.nisum.usercreation.apiuser.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -121,6 +120,28 @@ public class UserController {
         } catch (Exception exception){
             System.out.println("El error fue: " + exception.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/findUserByEmail")
+    public ResponseEntity<User> findUserByEmail(@RequestBody UserByEmailRequest emailRequest){
+        try{
+            User foundUser = userRepository.findByEmail(emailRequest.getEmail());
+            return new ResponseEntity<>(foundUser, HttpStatus.OK);
+        } catch (Exception exception){
+            System.out.println("El error fue: " + exception.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/findAllUsers")
+    public ResponseEntity<List<User>> findAllUsers(){
+        try{
+            List<User> foundUsers = userRepository.findAll();
+            return new ResponseEntity<>(foundUsers, HttpStatus.OK);
+        } catch (Exception exception){
+            System.out.println("El error fue: " + exception.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
